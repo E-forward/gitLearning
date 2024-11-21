@@ -4,6 +4,8 @@
 //  - https://docs.cocos.com/creator/manual/en/scripting/reference/attributes.html
 // Learn life-cycle callbacks:
 //  - https://docs.cocos.com/creator/manual/en/scripting/life-cycle-callbacks.html
+const RECT_SCALE = [1, 1, 1, 1, 0.8, 0.7];
+
 
 const {ccclass, property} = cc._decorator;
 
@@ -14,6 +16,9 @@ export default class Level extends cc.Component {
 
     @property(cc.Prefab)
     rectPrefab: cc.Prefab = null;
+
+    @property(cc.Camera)
+    camera: cc.Camera = null;
 
     /**地图信息 二维数组 */
     private levelList: number[][] = [];
@@ -32,6 +37,8 @@ export default class Level extends cc.Component {
 
     //game脚本
     private game;
+    //本关方块缩放比例
+    private rectScale: number = 1;
 
     // LIFE-CYCLE CALLBACKS:
 
@@ -46,6 +53,8 @@ export default class Level extends cc.Component {
         this.level_width = this.levelList[0].length;
         this.level_height = this.levelList.length;
 
+        this.rectScale = RECT_SCALE[currentLevel - 1];
+        this.rectWidth = this.rectHeight = this.rectScale * 80;
         //深克隆一下检查数组
         this.game.checkArray = structuredClone(this.levelList);
         
@@ -59,12 +68,20 @@ export default class Level extends cc.Component {
                 let rectScript =  rect.getComponent('Rect');
                 rectScript.game = this.game;            //把game传进rect，方便调用
 
-                rectScript.init(this.positionsArray[i][j].posX, this.positionsArray[i][j].posY, rectType, i , j);
+                rectScript.init(this.positionsArray[i][j].posX, this.positionsArray[i][j].posY, rectType, i , j, this.rectScale);
                 this.node.addChild(rect);
+                rect.width *= this.rectScale;
+                rect.height *= this.rectScale;
+                for(let rectChild of rect.children) {
+                    rectChild.width *= this.rectScale;
+                    rectChild.height *= this.rectScale;
+                }
                 if (rectType == -1)     rect.active = false;               //-1不显示
                 
             }
         }
+
+        
     }
 
     destroyLevel() {

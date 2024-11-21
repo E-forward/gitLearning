@@ -31,16 +31,31 @@ export default class UI extends cc.Component {
     // LIFE-CYCLE CALLBACKS:
 
     onLoad () {
-        this.game = this.node.parent.getComponent('Game');
+        // this.game = this.node.parent.getComponent('Game');
     }
 
     start () {
 
     }
 
+    //展示关卡信息： 1.第1、3、5关时有提示文字；2.显示当前是第几关；3.控制上下一关按钮是否可点击
+    showLevelInfo (level: number) {
+        this.levelLabel.string = level + '';
+        this.prevLevelButton.interactable = level <= 1 ? false : true;
+        this.nextLevelButton.interactable = level >= this.game.maxLevel ? false : true;
+    }
+
     setButtonsInteractable(bool: boolean) {
         this.backButton.interactable = bool;
         this.restartButton.interactable = bool;
+    }
+
+    onClickPrev() {
+        this.game.createPrevLevel();
+    }
+
+    onClickNext() {
+        this.game.createNextLevel();
     }
 
     onClickBack() {

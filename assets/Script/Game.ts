@@ -5,7 +5,6 @@
 // Learn life-cycle callbacks:
 //  - https://docs.cocos.com/creator/manual/en/scripting/life-cycle-callbacks.html
 
-import Level from "./Level";
 cc.macro.ENABLE_MULTI_TOUCH = false;
 
 const {ccclass, property} = cc._decorator;
@@ -25,9 +24,9 @@ export default class Game extends cc.Component {
 
 	
 	/**当前关卡 */
-	public currentLevel:number = 2;
+	public currentLevel:number = 5;
 	/**最大关卡数 */
-	public maxLevel:number = 50;
+	public maxLevel:number = 6;
 
     /**判断数组 */
     public checkArray: number[][] = [];
@@ -57,7 +56,9 @@ export default class Game extends cc.Component {
     createALevel(currentLevel:number) {
         //先把按钮取消禁用
         let uiScript = this.node.getChildByName('ui').getComponent('UI');
+        uiScript.game = this;
         uiScript.setButtonsInteractable(true);
+        uiScript.showLevelInfo(currentLevel);
 
         let levelNode = this.node.getChildByName('level');
         let levelScrpit = levelNode.getComponent("Level");
@@ -69,9 +70,17 @@ export default class Game extends cc.Component {
         levelScrpit.initLevel(this.totalMapInfomation, currentLevel);
     }
 
+    //生成上一关
+    createPrevLevel() {
+        if (this.currentLevel >= 2) {
+            this.currentLevel --;
+            this.createALevel(this.currentLevel);
+        }
+    }
+
     //生成下一关
     createNextLevel() {
-        if (this.currentLevel + 1 < this.maxLevel) {
+        if (this.currentLevel + 1 <= this.maxLevel) {
             this.currentLevel ++;
             this.createALevel(this.currentLevel);
         }

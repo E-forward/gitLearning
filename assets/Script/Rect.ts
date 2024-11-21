@@ -39,6 +39,9 @@ export default class Rect extends cc.Component {
 
     //自身是否可以点击
     private canTouch:boolean = true;
+
+    //自身缩放
+    private selfScale: number = 1;
     
     // LIFE-CYCLE CALLBACKS:
 
@@ -54,6 +57,8 @@ export default class Rect extends cc.Component {
             this.node.on(cc.Node.EventType.TOUCH_CANCEL,this.onTouchCancel, this);
             this.node.on(cc.Node.EventType.TOUCH_END,this.onTouchEnd, this);
         }
+
+        // this.zoomRatio = this.node.parent.getComponent('Level').camera.zoomRatio;
     }
 
     /**
@@ -64,8 +69,8 @@ export default class Rect extends cc.Component {
      * @param index_x 在数组中的下标
      * @param index_y 在数组中的下标
      */
-    init(positionX: number, positionY: number, type: number, index_x:number, index_y: number) {
-        this.node.x = positionX, this.node.y = positionY, this.type = type;
+    init(positionX: number, positionY: number, type: number, index_x:number, index_y: number, selfScale: number) {
+        this.node.x = positionX, this.node.y = positionY, this.type = type, this.selfScale = selfScale;
         this.node.scale = 0.01;
 
         if (!type) {
@@ -73,6 +78,7 @@ export default class Rect extends cc.Component {
         } else {
             this.index_x = index_x, this.index_y = index_y;
             this.label.string = type + '';
+            this.label.node.scale = selfScale;
         }
         
         //格子生成动画
@@ -124,7 +130,9 @@ export default class Rect extends cc.Component {
             return x >= x1 && x <= x1 + w && y >= y1 && y <= y1 + h;
         }
         
-        let square = [0 - this.node.width * 0.5, 0 -this.node.height * 0.5, this.node.width, this.node.height]
+        // let square = [0 - this.node.width * 0.5, 0 -this.node.height * 0.5, this.node.width, this.node.height];
+        let square = [-this.node.width * 0.5 * this.selfScale, -this.node.height * 0.5 * this.selfScale, this.node.width * this.selfScale, this.node.height * this.selfScale];
+        
         this.isInSquare = isPointInSquare(pointToNodeSpaceAr,square );
         //每次移动前重置找到的格子信息
         this.resetInfo();
@@ -239,7 +247,7 @@ export default class Rect extends cc.Component {
                     gray.active = true;
                     gray.scale = 0.1;
                     console.log(indexInFatherChildren);
-                }).to(0.5, {scale: 1}, {easing: 'backOut'}).call(() => {
+                }).to(0.5, {scale: this.selfScale}, {easing: 'backOut'}).call(() => {
                     //只有执行完成的是最后一个动画时才进行判断是否过关
                     if (i == this.temp.length - 1) {
                         if (this.canPassLevel()) {
