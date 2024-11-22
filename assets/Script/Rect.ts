@@ -263,13 +263,21 @@ export default class Rect extends cc.Component {
         }
     }
 
-    //格子消失动画:  1.禁用按钮； 2.执行消失动画
+    //格子消失动画:  1.禁用按钮； 2.执行消失动画; 3.存储最大关卡
     disappear() {
-        //2:先延迟0.5秒在开始执行消失动画        原作好像就延迟了0.2秒
+        //先延迟0.5秒在开始执行逻辑        原作好像就延迟了0.2秒
         this.schedule(() => {
             //1:先把所有按钮都禁用
             let uiScript = this.game.node.getChildByName('ui').getComponent("UI");
             uiScript.setButtonsInteractable(false);
+            //3：存信息
+            let nextLevelNumber = this.game.currentLevel + 1;
+            if (nextLevelNumber > this.game.currentMaximumLevelNumber && nextLevelNumber <= this.game.maxLevel) {
+                cc.sys.localStorage.setItem('maxLevel', nextLevelNumber);
+                this.game.currentMaximumLevelNumber = nextLevelNumber;
+            }
+
+
             let a = this.game.arr_back.length;
             let time_2 = [];    //存储每个tween所需要的时间。取最大值就是动画结束，在等0.5秒就可以生成下一关
             for (let arr of this.game.arr_back) {
@@ -281,16 +289,16 @@ export default class Rect extends cc.Component {
                     delayTime = b * 0.15 + a * 0.15;
                     let idx = arr[i][0] * this.game.checkArray[0].length + arr[i][1];
                     let node = this.node.parent.children[idx];
-                    let action =  cc.tween(node).delay(delayTime).to(0.5, {scale: 0}).start();
-                    let duration = action['_finalAction']['_duration'];     //tween持续时间
-                    let totalTime = duration + delayTime;       //tween持续时间 + 延迟时间  =  执行完这个tween所需时间
+                    cc.tween(node).delay(delayTime).to(0.5, {scale: 0}).start();        //2:消失动画 
+                    // let duration = action['_actions'][1]['_duration'];     //tween持续时间       //--操了，之前我这里写错了，tween持续时间只有0.5秒,不需要用这种方式获取。action就是上一行的tween
+                    let duration = 0.5;                                                 //tween持续时间
+                    let totalTime = duration + delayTime;       //tween持续时间 + 延迟时间  =  执行完这个tween所需时间   
                     time_2.push(totalTime);
-                    // console.log(action);
                 }
             }
             let maxTime = Math.max(...time_2);
             console.log(time_2, maxTime);
-            this.schedule(() => this.game.createNextLevel(), 0.5 + maxTime);
+            this.schedule(() => this.game.createNextLevel(), 0.7 + maxTime);
         }, 0.5, 0)
     }
 

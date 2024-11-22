@@ -5,7 +5,11 @@
 // Learn life-cycle callbacks:
 //  - https://docs.cocos.com/creator/manual/en/scripting/life-cycle-callbacks.html
 const RECT_SCALE = [1, 1, 1, 1, 0.8, 0.7];
-
+const SECRETLEVELINFO = [[-1,-1,-1,-1,3,3,3,3,-1,-1,-1,-1], [-1,-1,-1,-1,0,0,0,0,-1,-1,-1,-1], [-1,0,-1,-1,0,0,0,0,-1,-1,0,-1], [-1,0,3,0,0,0,0,0,0,0,0,-1],
+                         [-1,2,7,0,0,0,0,0,0,0,2,-1], [-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1], [-1,-1,0,1,0,-1,-1,0,1,0,-1,-1], [-1,-1,1,-1,1,-1,-1,1,-1,1,-1,-1], 
+                         [-1,-1,0,1,0,-1,-1,0,1,0,-1,-1], [-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1],[-1,-1,-1,-1,3,0,0,0,-1,-1,-1,-1], [0,-1,-1,0,0,0,0,0,5,-1,-1,0], 
+                         [1,0,0,0,3,-1,-1,3,0,0,0,1], [-1,0,0,2,-1,-1,-1,-1,2,0,0,-1]];
+const SECRETLEVEL_SCALE = 0.45;
 
 const {ccclass, property} = cc._decorator;
 
@@ -22,7 +26,6 @@ export default class Level extends cc.Component {
 
     /**地图信息 二维数组 */
     private levelList: number[][] = [];
-    private currentLevel: number = 0;
 
 	/**每张地图的宽度 */
 	private level_width:number = 0;
@@ -49,11 +52,16 @@ export default class Level extends cc.Component {
     }
 
     initLevel(totalMap: number[][][], currentLevel:number) {
-        this.levelList = totalMap[currentLevel - 1];        
+        if (currentLevel === 0) {
+            this.levelList = SECRETLEVELINFO;
+            this.rectScale = SECRETLEVEL_SCALE;
+        } else {
+            this.levelList = totalMap[currentLevel - 1];        
+            this.rectScale = RECT_SCALE[currentLevel - 1];
+        }
         this.level_width = this.levelList[0].length;
         this.level_height = this.levelList.length;
 
-        this.rectScale = RECT_SCALE[currentLevel - 1];
         this.rectWidth = this.rectHeight = this.rectScale * 80;
         //深克隆一下检查数组
         this.game.checkArray = structuredClone(this.levelList);

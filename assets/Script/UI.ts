@@ -17,6 +17,9 @@ export default class UI extends cc.Component {
     restartButton: cc.Button = null;
 
     @property(cc.Button)
+    coverSheetButton: cc.Button = null;
+
+    @property(cc.Button)
     nextLevelButton: cc.Button = null;
 
     @property(cc.Button)
@@ -24,6 +27,11 @@ export default class UI extends cc.Component {
 
     @property(cc.Label)
     levelLabel: cc.Label = null;
+
+    @property(cc.Label)
+    levelInofLabel: cc.Label = null;
+
+    private infomations = ['Swipe to fill the grid.', , 'The order in which you swipe matters.', , 'Enjoy.'];
 
     private game;
 
@@ -41,13 +49,17 @@ export default class UI extends cc.Component {
     //展示关卡信息： 1.第1、3、5关时有提示文字；2.显示当前是第几关；3.控制上下一关按钮是否可点击
     showLevelInfo (level: number) {
         this.levelLabel.string = level + '';
+        this.levelInofLabel.string = this.infomations[level - 1] || '';
         this.prevLevelButton.interactable = level <= 1 ? false : true;
-        this.nextLevelButton.interactable = level >= this.game.maxLevel ? false : true;
+        this.nextLevelButton.interactable = level >= this.game.currentMaximumLevelNumber ? false : true;
     }
 
     setButtonsInteractable(bool: boolean) {
         this.backButton.interactable = bool;
         this.restartButton.interactable = bool;
+        this.prevLevelButton.interactable = bool;
+        this.nextLevelButton.interactable = bool;
+        this.coverSheetButton.interactable = bool;
     }
 
     onClickPrev() {
@@ -56,6 +68,11 @@ export default class UI extends cc.Component {
 
     onClickNext() {
         this.game.createNextLevel();
+    }
+
+    onClickCoverSheet() {
+        this.game.uiNode.active = this.game.levelNode.active = false;
+        this.game.coverSheetNode.active = true;
     }
 
     onClickBack() {

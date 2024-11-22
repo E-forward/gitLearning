@@ -15,16 +15,30 @@ export default class Game extends cc.Component {
     @property(cc.JsonAsset)
     jsonAsset: cc.JsonAsset = null;
 
-    @property
-    text: string = 'hello';
+    @property(cc.Node)
+    coverSheetNode: cc.Node = null;
+
+    @property(cc.Node)
+    levelNode: cc.Node = null;
+
+    @property(cc.Node)
+    uiNode: cc.Node = null;
+
+    @property(cc.Node)
+    levelsViewNode: cc.Node = null;
+
+    @property(cc.Node)
+    authorViewNode: cc.Node = null;
 
     private totalMapInfomation: number[][][] = [];
 
     public levelList:number[] = [];
 
+    public currentMaximumLevelNumber: number = 0;
+
 	
 	/**当前关卡 */
-	public currentLevel:number = 5;
+	public currentLevel:number = 0;
 	/**最大关卡数 */
 	public maxLevel:number = 6;
 
@@ -42,26 +56,37 @@ export default class Game extends cc.Component {
 
     onLoad () {
         this.totalMapInfomation = this.jsonAsset.json;
-        console.log(this.totalMapInfomation);
-        this.createALevel(this.currentLevel);
+        this.initGameInfomations();
+        // console.log(this.totalMapInfomation);
+
+        this.coverSheetNode.getComponent('CoverSheet').game = this;
+        this.levelsViewNode.getComponent('LevelsView').game = this;
     }
 
     start () {
 
     } 
 
+    //从存储中拿出游戏信息——包括音乐是否静音，玩家游玩的最大关卡数等
+    initGameInfomations() {
+        this.currentMaximumLevelNumber = cc.sys.localStorage.getItem('maxLevel') || 1;
+        
+    }
+
 
 
     //生成一个关卡
     createALevel(currentLevel:number) {
+        this.coverSheetNode.active = this.levelsViewNode.active = false;
+        this.uiNode.active = this.levelNode.active = true;
+        this.setCurLevel(currentLevel);
         //先把按钮取消禁用
-        let uiScript = this.node.getChildByName('ui').getComponent('UI');
+        let uiScript = this.uiNode.getComponent('UI');
         uiScript.game = this;
         uiScript.setButtonsInteractable(true);
         uiScript.showLevelInfo(currentLevel);
 
-        let levelNode = this.node.getChildByName('level');
-        let levelScrpit = levelNode.getComponent("Level");
+        let levelScrpit = this.levelNode.getComponent("Level");
         levelScrpit.game = this;
         
         //把之前关卡先销毁
@@ -89,6 +114,22 @@ export default class Game extends cc.Component {
     destroyALevel() {
         
     }
+
+    /***************下面是制作人信息界面用到的东西，有点少就不单开一个类了，直接写在这里*************
+     ***************隐藏关地图写在Level.ts中了，还是那句话，我都做了这么多了，让我写在josn里然后改代码逻辑是不存在的，省事要紧 */
+
+    //隐藏关
+    onClickSecretButton() {
+        this.authorViewNode.active = false;
+        this.createALevel(0);
+    }
+    //点击按钮回封页
+    onClickCoverSheetButton() {
+        this.authorViewNode.active = false;
+        this.coverSheetNode.active = true;
+    }
+
+
 
     // update (dt) {}
 }
