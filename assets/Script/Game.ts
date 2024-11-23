@@ -30,6 +30,12 @@ export default class Game extends cc.Component {
     @property(cc.Node)
     authorViewNode: cc.Node = null;
 
+    @property(cc.Sprite)
+    bgSprite: cc.Sprite = null;
+
+    private material: cc.Material = null;
+    private time_shader;
+
     private totalMapInfomation: number[][][] = [];
 
     public levelList:number[] = [];
@@ -64,7 +70,10 @@ export default class Game extends cc.Component {
     }
 
     start () {
-
+        window.bgSprite = this.bgSprite;
+        this.material = this.bgSprite.getMaterial(0);
+        this.time_shader = 0;
+        // this.changeBGColor();
     } 
 
     //从存储中拿出游戏信息——包括音乐是否静音，玩家游玩的最大关卡数等
@@ -130,6 +139,41 @@ export default class Game extends cc.Component {
     }
 
 
+    changeBGColor() {
+        this.schedule(() => {
+            let random1 = this.getRandomInRange(0.8, 0.2);
+            let random2 = this.getRandomInRange(0.8, 0.2);
+            let random3 = this.getRandomInRange(0.8, 0);
+            let color = [random1,random2,random3,1];
+            
+            this.material.setProperty('colorStart', color);
+        },5, cc.macro.REPEAT_FOREVER);
+    }
 
-    // update (dt) {}
+    getRandomInRange(max, min) {
+        // 生成 min 到 max 的随机数
+        let random = Math.random() * (max - min) + min;
+        // 保留一位小数
+        return Math.round(random * 10) / 10;
+    }
+
+
+    update (dt) {
+
+        this.time_shader += dt;
+        this.material.setProperty('u_time', this.time_shader);
+        // console.log(dt,this.time_shader);
+    
+        const bgR = Math.sin(this.time_shader) * 0.5 + 0.5; // 红色通道随时间变化
+        const bgG = Math.cos(this.time_shader) * 0.5 + 0.7; // 绿色通道随时间变化
+        const bgB = Math.cos(this.time_shader) * 0.5 + 0.7; // 蓝色通道随时间变化
+        const bgColorVec4 = new cc.Vec4(bgR, bgG, bgB, 0.8); // 蓝色通道固定为0.5
+        this.material.setProperty('colorStart', bgColorVec4);
+
+        const bgR_2 = Math.cos(this.time_shader) * 0.5 + 0.7; // 红色通道随时间变化
+        const bgG_2 = Math.cos(this.time_shader) * 0.5 + 0.7; // 绿色通道随时间变化
+        const bgB_2 = Math.sin(this.time_shader) * 0.5 + 0.5; // 蓝色通道随时间变化
+        const bgColorVec4_2 = new cc.Vec4(bgR_2, bgG_2, bgB_2, 0.8); // 蓝色通道固定为0.5
+        this.material.setProperty('colorEnd', bgColorVec4_2);
+    }
 }

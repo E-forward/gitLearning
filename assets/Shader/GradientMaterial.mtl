@@ -1,0 +1,36 @@
+{
+  "__type__": "cc.Material",
+  "_name": "GradientMaterial",
+  "_objFlags": 0,
+  "_native": "",
+  "_effectAsset": {
+    "__uuid__": "ad367c8f-09f1-41a0-9252-778dfed85775"
+  },
+  "_techniqueIndex": 0,
+  "_techniqueData": {
+    "0": {
+      "props": {
+        "trans": 0,
+        "colorStart": {
+          "__type__": "cc.Color",
+          "r": 228,
+          "g": 50,
+          "b": 239,
+          "a": 255
+        },
+        "colorEnd": {
+          "__type__": "cc.Color",
+          "r": 114,
+          "g": 131,
+          "b": 235,
+          "a": 255
+        }
+      },
+      "defines": {
+        "USE_TEXTURE": false,
+        "USE_ALPHA_TEST": false,
+        "INPUT_IS_GAMMA": false
+      }
+    }
+  }
+}
