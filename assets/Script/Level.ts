@@ -4,7 +4,7 @@
 //  - https://docs.cocos.com/creator/manual/en/scripting/reference/attributes.html
 // Learn life-cycle callbacks:
 //  - https://docs.cocos.com/creator/manual/en/scripting/life-cycle-callbacks.html
-const RECT_SCALE = [1, 1, 1, 1, 0.8, 0.7];
+const RECT_SCALE = [1, 1, 1, 1, 0.8, 0.8, 0.8, 0.8, 0.9, 0.7, 0.9, 0.9, 0.9, 0.8, 0.9, 0.8, 0.8, 0.9, 0.9, 0.6, 1, 1, 1, 1, 1];
 const SECRETLEVELINFO = [[-1,-1,-1,-1,3,3,3,3,-1,-1,-1,-1], [-1,-1,-1,-1,0,0,0,0,-1,-1,-1,-1], [-1,0,-1,-1,0,0,0,0,-1,-1,0,-1], [-1,0,3,0,0,0,0,0,0,0,0,-1],
                          [-1,2,7,0,0,0,0,0,0,0,2,-1], [-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1], [-1,-1,0,1,0,-1,-1,0,1,0,-1,-1], [-1,-1,1,-1,1,-1,-1,1,-1,1,-1,-1], 
                          [-1,-1,0,1,0,-1,-1,0,1,0,-1,-1], [-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1],[-1,-1,-1,-1,3,0,0,0,-1,-1,-1,-1], [0,-1,-1,0,0,0,0,0,5,-1,-1,0], 
@@ -85,11 +85,8 @@ export default class Level extends cc.Component {
                     rectChild.height *= this.rectScale;
                 }
                 if (rectType == -1)     rect.active = false;               //-1不显示
-                
             }
         }
-
-        
     }
 
     destroyLevel() {
@@ -124,12 +121,12 @@ export default class Level extends cc.Component {
             // console.log(this.positionsArray[middle_i][middle_y], middle_i, middle_y) ;
             [index_x,index_y] = [middle_i,middle_y];                                //先求下标，再求位置，这里就分两行写。以免写一行以后看不懂
             [position_x, position_y] = [this.rectWidth * 0.5, -this.rectHeight * 0.5]
-        } else if (!isInteger(middle_i) && isInteger(middle_y)) {   //行为奇数，列为偶数，基准方块x坐标为0，y坐标为0 - 高度一半
+        } else if (!isInteger(middle_i) && isInteger(middle_y)) {   //行为奇数，列为偶数，基准方块x坐标为0 + 宽度一半，y坐标为0
             [index_x,index_y] = [Math.floor(middle_i),middle_y];
-            [position_x, position_y] = [0, -this.rectHeight * 0.5];
-        } else if (isInteger(middle_i) && !isInteger(middle_y)) {   //行为偶数，列为奇数，基准方块x坐标为0+ 宽度一半，y坐标为0 
+            [position_x, position_y] = [this.rectWidth * 0.5, 0];//this.rectWidth * 0.5, 0
+        } else if (isInteger(middle_i) && !isInteger(middle_y)) {   //行为偶数，列为奇数，基准方块x坐标为0，y坐标为0 - 高度一半
             [index_x,index_y] = [middle_i,Math.floor(middle_y)];
-            [position_x, position_y] = [this.rectWidth * 0.5, 0];
+            [position_x, position_y] = [0, -this.rectHeight * 0.5];
         } else {                                                    //行列都是奇数，基准方块坐标为0，0     默认即为0，0 故不用赋值
             [index_x,index_y] = [Math.floor(middle_i),Math.floor(middle_y)];
         }

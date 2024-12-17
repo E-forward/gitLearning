@@ -38,6 +38,7 @@ export default class LevelButton extends cc.Component {
 
     onClick() {
         this.game.createALevel(this.levelNumber + 1);
+        this.game.playEffect(1);
     }
 
     // update (dt) {}

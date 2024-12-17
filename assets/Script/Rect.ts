@@ -246,60 +246,66 @@ export default class Rect extends cc.Component {
                 cc.tween(gray).delay(0.15 * i).call(() => {
                     gray.active = true;
                     gray.scale = 0.1;
-                    console.log(indexInFatherChildren);
+                    // console.log(indexInFatherChildren);
+                    //生成格子时每个音效都不相同，我没资源，就直接重复播放了。有资源后根据for循环的i可以实现播放不同的音效，下面代码直接换成this.game.playEffect(this.type - i)就可以。
+                    this.game.playEffect(0);
                 }).to(0.5, {scale: this.selfScale}, {easing: 'backOut'}).call(() => {
                     //只有执行完成的是最后一个动画时才进行判断是否过关
                     if (i == this.temp.length - 1) {
+                        // bug复现程度： 必现！！！！                      气死我了，我搞不定。   当然，我可以过关的时候不放过关音效，那样就不会有bug。 只要我不做就不会出错23333。
+                        //现在有个bug：过关的时候这里的逻辑会执行两次，导致会放两次过关音效。打log发现会打印两次11111.。我对这个bug的思考：这里是是tween.call()回调进来的，所以我猜测跟引擎底层有关，我自己真解决不了。
+                        console.log(111111);
                         if (this.canPassLevel()) {
+                            console.log(222222);
                             //可以过关，执行消失动画
                             this.disappear();       
                         }
+                        
                     }
                 }).start();     //ps:这个tween有bug  所有判断都正确执行了。就是动画不会生成。不影响所有逻辑，只是单纯卡了一个动画。 么得修改  偶现， 一般玩家正常游玩中不会遇到
             }
-
-            //生成格子后
-            // console.log(this.game.arr_back);
         }
     }
 
-    //格子消失动画:  1.禁用按钮； 2.执行消失动画; 3.存储最大关卡
+    //格子消失动画:  1.禁用按钮； 2.执行消失动画; 3.存储最大关卡; 4.格子开始消失时播放一个过关音效
     disappear() {
         //先延迟0.5秒在开始执行逻辑        原作好像就延迟了0.2秒
         this.schedule(() => {
-            //1:先把所有按钮都禁用
+            //先把所有按钮都禁用
             let uiScript = this.game.node.getChildByName('ui').getComponent("UI");
             uiScript.setButtonsInteractable(false);
-            //3：存信息
+            //存信息
             let nextLevelNumber = this.game.currentLevel + 1;
             if (nextLevelNumber > this.game.currentMaximumLevelNumber && nextLevelNumber <= this.game.maxLevel) {
-                cc.sys.localStorage.setItem('maxLevel', nextLevelNumber);
+                this.game.userData.maxLevel = nextLevelNumber;
+                cc.sys.localStorage.setItem('userData', JSON.stringify(this.game.userData));
                 this.game.currentMaximumLevelNumber = nextLevelNumber;
             }
-
-
+            //过关音效
+            this.game.playEffect(2);
+            //消失动画 
             let a = this.game.arr_back.length;
             let time_2 = [];    //存储每个tween所需要的时间。取最大值就是动画结束，在等0.5秒就可以生成下一关
             for (let arr of this.game.arr_back) {
                 a--;
-                console.log(arr);
+                // console.log(arr);
                 let b = 0, delayTime = 0;
                 for (let i = arr.length - 1; i >= 0; i--) {
                     b++;
                     delayTime = b * 0.15 + a * 0.15;
                     let idx = arr[i][0] * this.game.checkArray[0].length + arr[i][1];
                     let node = this.node.parent.children[idx];
-                    cc.tween(node).delay(delayTime).to(0.5, {scale: 0}).start();        //2:消失动画 
+                    cc.tween(node).delay(delayTime).to(0.5, {scale: 0}).start();        
                     // let duration = action['_actions'][1]['_duration'];     //tween持续时间       //--操了，之前我这里写错了，tween持续时间只有0.5秒,不需要用这种方式获取。action就是上一行的tween
-                    let duration = 0.5;                                                 //tween持续时间
+                    let duration = 0.5;                         //tween持续时间
                     let totalTime = duration + delayTime;       //tween持续时间 + 延迟时间  =  执行完这个tween所需时间   
                     time_2.push(totalTime);
                 }
             }
             let maxTime = Math.max(...time_2);
-            console.log(time_2, maxTime);
+            // console.log(time_2, maxTime);
             this.schedule(() => this.game.createNextLevel(), 0.7 + maxTime);
-        }, 0.5, 0)
+        }, 0.5, 0);
     }
 
     onTouchEnd(e) {
@@ -308,13 +314,12 @@ export default class Rect extends cc.Component {
     }
 
     canPassLevel() {
-        let num = 0;
         for (let i = 0; i < this.game.checkArray.length; i++) {
             for (let j = 0; j < this.game.checkArray[i].length; j++) {
-                if (typeof(this.game.checkArray[i][j]) == 'number' && 0 === this.game.checkArray[i][j]) num++;
+                if (typeof(this.game.checkArray[i][j]) == 'number' && 0 === this.game.checkArray[i][j]) return false;
             }
         }
-        return num <= 0;
+        return true;
     }
 
     /**写入找到的格子信息，透明格子由0 改成fillNumber */
@@ -365,9 +370,7 @@ export default class Rect extends cc.Component {
         this.greenNode.active = this.isInSquare || this.findNum >= this.type;
         if(this.isInSquare) {       //拖到方块自身以内，重置信息，自身显示绿色
             this.resetInfo();
-           
         } else {
-
             //先找到透明块：  所有方块都由自身父节点添加，根据temp存下标信息，可以找到透明块是父节点的第几个子节点  计算方式为 this.temp[i][0] * 宽度 + this.temp[i][1]  
             //                                                                                                   宽度获取方式很多。其一为this.game.checkArray[0].length
             for (let i = 0; i < this.temp.length; i++) {
@@ -378,7 +381,6 @@ export default class Rect extends cc.Component {
                 red.active = this.findNum < this.type;
                 green.active = !red.active;
             }
-    
         }
     }
 

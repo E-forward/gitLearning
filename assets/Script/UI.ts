@@ -64,19 +64,23 @@ export default class UI extends cc.Component {
 
     onClickPrev() {
         this.game.createPrevLevel();
+        this.game.playEffect(2);
     }
 
     onClickNext() {
         this.game.createNextLevel();
+        this.game.playEffect(2);
     }
 
     onClickCoverSheet() {
         this.game.uiNode.active = this.game.levelNode.active = false;
         this.game.coverSheetNode.active = true;
+        this.game.playEffect(1);
     }
 
     onClickBack() {
         if (!this.game.arr_back.length) return;
+        this.game.playEffect(1);
         let len = this.game.arr_back.length;
 
         //拿出当前回退按钮需要的数据
@@ -97,7 +101,10 @@ export default class UI extends cc.Component {
             cc.Tween.stopAllByTarget(gray);
             //已经生成的格子才有消失动画
             if (gray.active ) {
-                cc.tween(gray).delay(0.15 * a).to(0.15, {scale: 0.01}).call(() =>{gray.active = false; console.log(rectIndexInFatherChildren);}).start();
+                cc.tween(gray).delay(0.15 * a).to(0.15, {scale: 0.01}).call(() =>{
+                    gray.active = false; 
+                    // console.log(rectIndexInFatherChildren);
+                }).start();
                 a++;
             }
 

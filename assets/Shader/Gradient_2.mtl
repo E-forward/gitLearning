@@ -1,0 +1,27 @@
+{
+  "__type__": "cc.Material",
+  "_name": "Gradient_2",
+  "_objFlags": 0,
+  "_native": "",
+  "_effectAsset": {
+    "__uuid__": "6167e44f-49ce-4f1f-830c-2856be91e3d3"
+  },
+  "_techniqueIndex": 0,
+  "_techniqueData": {
+    "0": {
+      "defines": {
+        "USE_TEXTURE": false,
+        "USE_ALPHA_TEST": false
+      },
+      "props": {
+        "colorEnd": {
+          "__type__": "cc.Color",
+          "r": 127,
+          "g": 218,
+          "b": 20,
+          "a": 255
+        }
+      }
+    }
+  }
+}

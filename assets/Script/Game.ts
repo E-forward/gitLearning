@@ -30,24 +30,33 @@ export default class Game extends cc.Component {
     @property(cc.Node)
     authorViewNode: cc.Node = null;
 
+    @property(cc.Node)
+    optionsViewNode: cc.Node = null;
+
     @property(cc.Sprite)
     bgSprite: cc.Sprite = null;
 
+    @property(cc.AudioClip)
+    audioClips: cc.AudioClip[] = [];
+
+    @property(cc.AudioClip)
+    bgm: cc.AudioClip = null;
+
+    //玩家数据
+    public userData = null;
+
+    //shader用
     private material: cc.Material = null;
     private time_shader;
 
     private totalMapInfomation: number[][][] = [];
-
-    public levelList:number[] = [];
-
+    // public levelList:number[] = [];
     public currentMaximumLevelNumber: number = 0;
-
 	
 	/**当前关卡 */
 	public currentLevel:number = 0;
 	/**最大关卡数 */
-	public maxLevel:number = 6;
-
+	public maxLevel:number = 20;
     /**判断数组 */
     public checkArray: number[][] = [];
     /**填充标志数 */
@@ -63,14 +72,16 @@ export default class Game extends cc.Component {
     onLoad () {
         this.totalMapInfomation = this.jsonAsset.json;
         this.initGameInfomations();
+        this.playMusic();
         // console.log(this.totalMapInfomation);
 
         this.coverSheetNode.getComponent('CoverSheet').game = this;
         this.levelsViewNode.getComponent('LevelsView').game = this;
+        this.optionsViewNode.getComponent('OptionsView').game = this;
     }
 
     start () {
-        window.bgSprite = this.bgSprite;
+        // window.bgSprite = this.bgSprite;
         this.material = this.bgSprite.getMaterial(0);
         this.time_shader = 0;
         // this.changeBGColor();
@@ -78,11 +89,13 @@ export default class Game extends cc.Component {
 
     //从存储中拿出游戏信息——包括音乐是否静音，玩家游玩的最大关卡数等
     initGameInfomations() {
-        this.currentMaximumLevelNumber = cc.sys.localStorage.getItem('maxLevel') || 1;
-        
+        this.userData = JSON.parse(cc.sys.localStorage.getItem('userData'));
+        if (!this.userData) {
+            this.userData = {maxLevel : 1, music: true, soundEffect: true};
+            cc.sys.localStorage.setItem('userData',JSON.stringify(this.userData));
+        }
+        this.currentMaximumLevelNumber = this.userData.maxLevel;
     }
-
-
 
     //生成一个关卡
     createALevel(currentLevel:number) {
@@ -124,30 +137,46 @@ export default class Game extends cc.Component {
         
     }
 
-    /***************下面是制作人信息界面用到的东西，有点少就不单开一个类了，直接写在这里*************
+    /***************下面是制作人信息界面用到的东西，有点少(其实就俩按钮)就不单开一个类了，直接写在这里*************
      ***************隐藏关地图写在Level.ts中了，还是那句话，我都做了这么多了，让我写在josn里然后改代码逻辑是不存在的，省事要紧 */
 
-    //隐藏关
+    //点击后隐藏关
     onClickSecretButton() {
         this.authorViewNode.active = false;
         this.createALevel(0);
+        this.playEffect(1);
     }
     //点击按钮回封页
     onClickCoverSheetButton() {
         this.authorViewNode.active = false;
+        this.optionsViewNode.active = false;
         this.coverSheetNode.active = true;
+        this.playEffect(1);
     }
 
+    /**********************************************制作人页面结束************************************************************** */
 
-    changeBGColor() {
-        this.schedule(() => {
-            let random1 = this.getRandomInRange(0.8, 0.2);
-            let random2 = this.getRandomInRange(0.8, 0.2);
-            let random3 = this.getRandomInRange(0.8, 0);
-            let color = [random1,random2,random3,1];
-            
-            this.material.setProperty('colorStart', color);
-        },5, cc.macro.REPEAT_FOREVER);
+    playEffect(clipIndex: number) {
+        if (this.userData.soundEffect) {
+            cc.audioEngine.playEffect(this.audioClips[clipIndex], false);
+        }
+    }
+
+    private musicID: number = null; 
+
+    playMusic() {
+        if (this.userData.music && this.musicID == null) {
+            this.musicID = cc.audioEngine.playMusic(this.bgm, true);
+            cc.audioEngine.setMusicVolume(0.2);
+        } else if (this.userData.music && this.musicID != undefined) {
+            cc.audioEngine.resumeMusic();
+        }
+    }
+
+    pauseMusic() {
+        if (this.musicID != null) {
+            cc.audioEngine.pauseMusic();
+        }
     }
 
     getRandomInRange(max, min) {
@@ -157,10 +186,9 @@ export default class Game extends cc.Component {
         return Math.round(random * 10) / 10;
     }
 
-
     update (dt) {
 
-        this.time_shader += dt;
+        this.time_shader += dt * 0.2;
         this.material.setProperty('u_time', this.time_shader);
         // console.log(dt,this.time_shader);
     

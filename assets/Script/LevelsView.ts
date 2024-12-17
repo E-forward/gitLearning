@@ -48,6 +48,7 @@ export default class LevelsView extends cc.Component {
     onClickCoverSheetButton() {
         this.node.active = false;
         this.game.coverSheetNode.active = true;
+        this.game.playEffect(1);
     }
 
     // update (dt) {}
