@@ -5,8 +5,6 @@
 // Learn life-cycle callbacks:
 //  - https://docs.cocos.com/creator/manual/en/scripting/life-cycle-callbacks.html
 
-
-
 const {ccclass, property} = cc._decorator;
 
 @ccclass
@@ -56,12 +54,7 @@ export default class Rect extends cc.Component {
             this.node.on(cc.Node.EventType.TOUCH_MOVE,this.onTouchMove, this);
             this.node.on(cc.Node.EventType.TOUCH_CANCEL,this.onTouchCancel, this);
             this.node.on(cc.Node.EventType.TOUCH_END,this.onTouchEnd, this);
-
-            //是数字格子，this.game.numberRect_Count+1
-            this.game.numberRect_Count ++;
         }
-
-        // this.zoomRatio = this.node.parent.getComponent('Level').camera.zoomRatio;
     }
 
     /**
@@ -363,7 +356,6 @@ export default class Rect extends cc.Component {
 
     /**每次拖动时检查信息，判断该显示红色还是绿色 */ 
     doCheck() {
-
         //先判断自身显示红色还是绿色
         this.redNode.active = !this.isInSquare && this.findNum < this.type;
         this.greenNode.active = this.isInSquare || this.findNum >= this.type;

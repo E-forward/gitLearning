@@ -25,14 +25,9 @@ export default class GradientShaderControl extends cc.Component {
 
     private time: number = 1; // 累计的时间
 
-    private materialInstance: cc.Material = null; // 当前 Sprite 的材质实例
-
     // 初始化
     onLoad() {
         if (this.material) {
-            // this.materialInstance = this.material.clone();
-            // this.materialInstance = new cc.Material();
-            // this.materialInstance.initialize
             // this.material.setProperty('colorStart', this.colorStart); // 设置起始颜色
             // this.material.setProperty('colorEnd', this.colorEnd); // 设置目标颜色
             this.material.setProperty('u_duration', this.duration); // 设置渐变持续时间

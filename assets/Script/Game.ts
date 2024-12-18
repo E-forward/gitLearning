@@ -140,10 +140,6 @@ export default class Game extends cc.Component {
             this.congratulationsViewnNode.active = true;
         }
     }
-    //销毁一个关卡
-    destroyALevel() {
-        
-    }
 
     /***************下面是制作人信息界面用到的东西，有点少(其实就俩按钮)就不单开一个类了，直接写在这里*************
      ***************隐藏关地图写在Level.ts中了，还是那句话，我都做了这么多了，让我写在josn里然后改代码逻辑是不存在的，省事要紧 */
@@ -188,15 +184,7 @@ export default class Game extends cc.Component {
         }
     }
 
-    getRandomInRange(max, min) {
-        // 生成 min 到 max 的随机数
-        let random = Math.random() * (max - min) + min;
-        // 保留一位小数
-        return Math.round(random * 10) / 10;
-    }
-
     update (dt) {
-
         this.time_shader += dt * 0.2;
         this.material.setProperty('u_time', this.time_shader);
         // console.log(dt,this.time_shader);

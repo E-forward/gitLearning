@@ -95,10 +95,6 @@ export default class Level extends cc.Component {
         this.game.arr_back = [];
     }
 
-    creatMap() {
-
-    }
-
     /**设置好每一个方块的坐标 */
     setPosition(levelList) {
         this.positionsArray = new Array(this.level_height).fill(0).map((v, k) => new Array(this.level_width).fill(0).map(v =>new Object({posX: 0, posY: 0})));
