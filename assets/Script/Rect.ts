@@ -56,6 +56,9 @@ export default class Rect extends cc.Component {
             this.node.on(cc.Node.EventType.TOUCH_MOVE,this.onTouchMove, this);
             this.node.on(cc.Node.EventType.TOUCH_CANCEL,this.onTouchCancel, this);
             this.node.on(cc.Node.EventType.TOUCH_END,this.onTouchEnd, this);
+
+            //是数字格子，this.game.numberRect_Count+1
+            this.game.numberRect_Count ++;
         }
 
         // this.zoomRatio = this.node.parent.getComponent('Level').camera.zoomRatio;
@@ -231,8 +234,7 @@ export default class Rect extends cc.Component {
             this.labelNode.active = false;
             this.greenNode.active = false;
 
-
-            //先写入信息
+            // //先写入信息
             this.writeInfo();
             //记录每次播放填充格子动画所花费时间—— 其实就是生成最后一个格子时tween动画所花费的时间 计算方式： 执行到最后一个tween动画时的delayTime + tween时间
             
@@ -250,19 +252,16 @@ export default class Rect extends cc.Component {
                     //生成格子时每个音效都不相同，我没资源，就直接重复播放了。有资源后根据for循环的i可以实现播放不同的音效，下面代码直接换成this.game.playEffect(this.type - i)就可以。
                     this.game.playEffect(0);
                 }).to(0.5, {scale: this.selfScale}, {easing: 'backOut'}).call(() => {
+                    //每一个生成格子的动画结束后再给this.game.checkArray_1对应的位置赋值。然后再判断能否过关
+                    let a = this.temp[i][0], b = this.temp[i][1];
+                    this.game.checkArray_1[a][b] = this.game.fillNumber;
                     //只有执行完成的是最后一个动画时才进行判断是否过关
-                    if (i == this.temp.length - 1) {
-                        // bug复现程度： 必现！！！！                      气死我了，我搞不定。   当然，我可以过关的时候不放过关音效，那样就不会有bug。 只要我不做就不会出错23333。
-                        //现在有个bug：过关的时候这里的逻辑会执行两次，导致会放两次过关音效。打log发现会打印两次11111.。我对这个bug的思考：这里是是tween.call()回调进来的，所以我猜测跟引擎底层有关，我自己真解决不了。
-                        console.log(111111);
+                    if (i == this.temp.length - 1 ) {
                         if (this.canPassLevel()) {
-                            console.log(222222);
-                            //可以过关，执行消失动画
-                            this.disappear();       
+                            this.disappear();   
                         }
-                        
                     }
-                }).start();     //ps:这个tween有bug  所有判断都正确执行了。就是动画不会生成。不影响所有逻辑，只是单纯卡了一个动画。 么得修改  偶现， 一般玩家正常游玩中不会遇到
+                }).start();     //ps:这个tween有bug  所有判断都正确执行了。就是动画不会生成。不影响所有逻辑，只是单纯卡了一个动画。 么得修改  偶现， 一般玩家正常游玩中不会遇到。  后续：（已经遇不到bug了）
             }
         }
     }
@@ -296,7 +295,6 @@ export default class Rect extends cc.Component {
                     let idx = arr[i][0] * this.game.checkArray[0].length + arr[i][1];
                     let node = this.node.parent.children[idx];
                     cc.tween(node).delay(delayTime).to(0.5, {scale: 0}).start();        
-                    // let duration = action['_actions'][1]['_duration'];     //tween持续时间       //--操了，之前我这里写错了，tween持续时间只有0.5秒,不需要用这种方式获取。action就是上一行的tween
                     let duration = 0.5;                         //tween持续时间
                     let totalTime = duration + delayTime;       //tween持续时间 + 延迟时间  =  执行完这个tween所需时间   
                     time_2.push(totalTime);
@@ -313,10 +311,11 @@ export default class Rect extends cc.Component {
         this.greenNode.active = this.redNode.active = false;
     }
 
+    //checkArray_1中所有的0都变了说明过关
     canPassLevel() {
-        for (let i = 0; i < this.game.checkArray.length; i++) {
-            for (let j = 0; j < this.game.checkArray[i].length; j++) {
-                if (typeof(this.game.checkArray[i][j]) == 'number' && 0 === this.game.checkArray[i][j]) return false;
+        for (let i = 0; i < this.game.checkArray_1.length; i++) {
+            for (let j = 0; j < this.game.checkArray_1[i].length; j++) {
+                if (typeof(this.game.checkArray_1[i][j]) == 'number' && 0 === this.game.checkArray_1[i][j]) return false;
             }
         }
         return true;

@@ -16,8 +16,6 @@ const {ccclass, property} = cc._decorator;
 @ccclass
 export default class Level extends cc.Component {
 
-   
-
     @property(cc.Prefab)
     rectPrefab: cc.Prefab = null;
 
@@ -65,6 +63,7 @@ export default class Level extends cc.Component {
         this.rectWidth = this.rectHeight = this.rectScale * 80;
         //深克隆一下检查数组
         this.game.checkArray = structuredClone(this.levelList);
+        this.game.checkArray_1 = structuredClone(this.levelList);
         
         //先求每个方块的坐标
         this.setPosition(this.levelList);
@@ -92,6 +91,7 @@ export default class Level extends cc.Component {
     destroyLevel() {
         this.node.removeAllChildren();
         this.game.checkArray = [];
+        this.game.checkArray_1 = [];
         this.game.arr_back = [];
     }
 

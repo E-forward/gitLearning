@@ -106,19 +106,19 @@ export default class UI extends cc.Component {
                     // console.log(rectIndexInFatherChildren);
                 }).start();
                 a++;
-            }
-
-            //game中checkArray对应数字改为0
+            } 
+            
+            //game中checkArray和checkArray_1对应数字改为0
             this.game.checkArray[id_x][id_y] = 0;         
+            this.game.checkArray_1[id_x][id_y] = 0;         
         }
 
         //数字格子还原
         let numberRect_idx = backInfoArr[0][0] * this.game.checkArray[0].length + backInfoArr[0][1];
         let numberRect = levelNode.children[numberRect_idx];
         let numberRectScript = numberRect.getComponent('Rect');
-        numberRectScript.canTouch = true;
         numberRectScript.labelNode.active = true;
-        cc.tween(numberRect).by(0.8, {angle: 360}, {easing: 'sineOut'}).start();       //数字格子自身转圈动画
+        cc.tween(numberRect).by(0.8, {angle: 360}, {easing: 'sineOut'}).call(() => numberRectScript.canTouch = true).start();       //数字格子自身转圈动画
 
         //回退一步后，撤销存储信息
         this.game.arr_back.splice(len - 1, 1);

@@ -31,7 +31,7 @@ export default class RadioButton extends cc.Component {
     position_right =  cc.v3(0, 0, 0);
 
     @property
-    text: string = '';      //string为 music表示为控制背景音乐的按钮，string为 audioEffect表示控制音效的按钮
+    text: string = '';      //string为 music表示为控制背景音乐的按钮，string为 soundEffect表示控制音效的按钮
 
     private game;
     private isSliderOn = true;

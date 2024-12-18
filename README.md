@@ -1,2 +1,3 @@
-# hello-world
-Hello world new project template.
+# 非原创项目
+原作为4399小游戏中《占满格子》。
+个人用来练习，未商用。如有侵权，联系后删除。

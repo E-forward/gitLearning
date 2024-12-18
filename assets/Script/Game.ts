@@ -33,6 +33,9 @@ export default class Game extends cc.Component {
     @property(cc.Node)
     optionsViewNode: cc.Node = null;
 
+    @property(cc.Node)
+    congratulationsViewnNode: cc.Node = null;
+
     @property(cc.Sprite)
     bgSprite: cc.Sprite = null;
 
@@ -58,12 +61,13 @@ export default class Game extends cc.Component {
 	/**最大关卡数 */
 	public maxLevel:number = 20;
     /**判断数组 */
-    public checkArray: number[][] = [];
+    public checkArray: number[][] = [];         //这个用来找格子
+    public checkArray_1: number[][] = [];       //这个用来判断能否过关
     /**填充标志数 */
     public fillNumber: number = 9999;
     /**回退按钮用数组 */
     public arr_back: number[][][] = [];
-
+    
 	public setCurLevel(a:number) {
 		this.currentLevel = a;
 	}
@@ -130,6 +134,10 @@ export default class Game extends cc.Component {
         if (this.currentLevel + 1 <= this.maxLevel) {
             this.currentLevel ++;
             this.createALevel(this.currentLevel);
+        } else {
+            //全部通关后，展示致谢页面
+            this.uiNode.active = this.levelsViewNode.active = false;
+            this.congratulationsViewnNode.active = true;
         }
     }
     //销毁一个关卡
@@ -150,6 +158,7 @@ export default class Game extends cc.Component {
     onClickCoverSheetButton() {
         this.authorViewNode.active = false;
         this.optionsViewNode.active = false;
+        this.congratulationsViewnNode.active = false;
         this.coverSheetNode.active = true;
         this.playEffect(1);
     }
